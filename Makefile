@@ -1,7 +1,6 @@
 PREFIX = /usr/local
 
 install: grl
-		pacman --noconfirm -S python3 python-pip
 		pip3 install unidecode
 		mkdir -p $(DESTDIR)$(PREFIX)/share
 		cp -f strongsgreek.xml $(DESTDIR)$(PREFIX)/share/strongsgreek.xml
