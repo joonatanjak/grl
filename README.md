@@ -43,5 +43,9 @@ Examples:
 ## Known bugs
 * References to Greek words from definitions are empty.
 
+## Upcoming changes/features
+* Comment the code
+* Optimize the code
+
 ## Credits
 Strong's Exhaustive Concordance by James Strong, 1890. XML by [Ulrik Sandborg-Petersen](http://ulrikp.org). Public Domain
