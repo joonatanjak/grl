@@ -2,6 +2,7 @@
 Simple command-line Greek lexicon for Biblical (Koine) Greek.
 
 # Usage
+```
 usage: grl [options] <word>
 
 Look up the Strong's lexicon of a koine greek word.
@@ -26,3 +27,4 @@ Examples:
     You can find some words using the rough transliteraion of it
         grl agape
 
+```
