@@ -2,9 +2,9 @@
 Simple command-line Greek lexicon for Biblical (Koine) Greek.
 
 ## Installation
-Dependencies: `python3`, `python-pip` and `git`, Install them with `apt`, `pacman` or whatever.
+> Dependencies: `python3`, `python-pip` and `git`, Install them with `apt`, `pacman` or any toher package manager.
 
-```
+```sh
 git clone https://github.com/joonatanjak/grl.git
 cd grl
 sudo make install
