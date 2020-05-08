@@ -1,7 +1,7 @@
 # grl
 Simple command-line Greek lexicon for Biblical (Koine) Greek.
 
-# Usage
+### Usage
 ```
 usage: grl [options] <word>
 
