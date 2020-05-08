@@ -34,8 +34,8 @@ When no options are supplied the program will output the Strong's number, unicod
 Examples:
     Look up "Θεός"
         grl Θεός
-    Only output the KJV definition of παρακοῆς
-        grl -k παρακοῆς
+    Only output the Strong's definition of παρακοῆς
+        grl -s παρακοῆς
     You can find some words using the rough transliteraion of it
         grl agape
     
@@ -44,3 +44,6 @@ Examples:
 
 ## Known bugs
 * References to Greek words from definitions are empty.
+
+## Credits
+Strong's Exhaustive Concordance by James Strong, 1890. XML by [Ulrik Sandborg-Petersen](http://ulrikp.org). Public Domain
