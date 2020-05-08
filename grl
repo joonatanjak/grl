@@ -1,0 +1,232 @@
+#!/bin/python3
+from xml.dom import minidom
+import unidecode
+import sys
+import difflib
+import getopt
+
+usage = "usage: grl [options] <greek word>\nuse --help for more info"
+xmlfile = 'strongsgreek.xml'
+
+help_text = """\
+usage: grl [options] <word>
+
+Look up the Strong's lexicon of a koine greek word.
+Options:
+ -n, --number               Display the Strong's number.
+ -u, --unicode              Display the word in unicode.
+ -t, --transliteration      Display the transliteration.
+ -p, --pronunciation        Display the pronunciation.
+ -s, --strongs-definition   Display the Strong's definiton.
+ -k, --kjv-definition       Display the KJV definition.
+
+ -S, --strict               Output only, if the word has an exact match, otherwise exit(1).
+ -q, --quiet                Only display the attributes. Each attribute will be seperated with a tab.
+                            The order of each attribute is number, unicode, transliteration, pronunciation, strongs-definition, kjv-definition.
+ -d, --default              Select the first similiar word without asking anything.
+ -h, --help                 Show this message
+
+When no options are supplied the program will output the Strong's number, unicode, pronunciation and KJV definition.
+Examples:
+    Only output the KJV definition of παρακοῆς
+        grl -k παρακοῆς
+    You can find some words using the rough transliteraion of it
+        grl agape
+"""
+
+def main(argv):
+    # Default options
+    numberOption = True
+    unicodeOption = True
+    transliterationOption = False
+    pronunciationOption = True
+    strongs_defOption = False
+    kjv_defOption = True
+    strictOption = False
+    quietOption = False
+    defaultOption = False
+
+    try:
+        opts, args = getopt.getopt(argv,"nutpskSqdh",["number","unicode","transliteration","pronunciation","strongs-definition","kjv-definition","strict","quiet","default","help"])
+    except getopt.GetoptError:
+        print(usage)
+        sys.exit(2)
+    
+    if len(opts) > 0: # Disable the default options, when an option is selected
+            
+            numberOption = False
+            unicodeOption = False
+            transliterationOption = False
+            pronunciationOption = False
+            strongs_defOption = False
+            kjv_defOption = False
+            strictOption = False
+            quietOption = False
+            defaultOption = False
+
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print(help_text)
+            sys.exit()
+
+        if opt in ("-n", "--number"):
+            numberOption = True
+        if opt in ("-u", "--unicode"):
+            unicodeOption = True
+        if opt in ("-t", "--transliteration"):
+            transliterationOption = True
+        if opt in ("-p", "--pronunciation"):
+            pronunciationOption = True
+        if opt in ("-s", "--strongs-definition"):
+            strongs_defOption = True
+        if opt in ("-k", "--kjv-definition"):
+            kjv_defOption = True
+        if opt in ("-S", "--strict"):
+            strictOption = True
+        if opt in ("-q", "--quiet"):
+            quietOption = True
+        if opt in ("-d", "--default"):
+            defaultOption = True
+
+    dom = minidom.parse(xmlfile)
+
+    def deunicode(word):
+        return unidecode.unidecode(word.lower())
+
+    def printDefinition(number, unicode, translit, pronunciation, strongs_def, kjv_def):
+        outputString = ""
+        if quietOption:
+            if numberOption:
+                outputString += number + "\t"
+            if unicodeOption:
+                outputString += unicode + "\t"
+            if transliterationOption:
+                outputString += transliterationOption + "\t"
+            if pronunciationOption:
+                outputString += pronunciation+ "\t"
+            if strongs_defOption:
+                outputString += strongs_def+ "\t"
+            if kjv_defOption:
+                outputString += kjv_def+ "\t"
+        else:
+            if unicodeOption:
+                outputString += unicode.title() + " "
+                if transliterationOption:
+                    outputString += "[" + translit + "] "
+                if numberOption:
+                    outputString +=  "# Strong's number: " + number
+                outputString += "\n"
+            else:
+                if transliterationOption:
+                    outputString += "Transliteraion: " + translit + "\n"
+                if numberOption:
+                    outputString +=  "Strong's number: " + number + "\n"
+            if pronunciationOption:
+                outputString += "Pronunciation: " + pronunciation + "\n"
+            if strongs_defOption:
+                outputString += "Strong's defintion: " + strongs_def + "\n"
+            if kjv_defOption:
+                outputString += "KJV defintion: " + kjv_def + "\n"
+
+        print(outputString.strip())
+            
+
+    def getText(nodelist):
+        rc = []
+        for node in nodelist:
+            if node.nodeType == node.TEXT_NODE:
+                rc.append(node.data)
+        return ''.join(rc)
+    
+    def querydata(query):
+        words = []
+        for entry in dom.getElementsByTagName("entry"):        
+            number = entry.attributes['strongs'].value #Strong's number
+            
+            unicode = "data_not_set"
+            translit = "data_not_set"
+            pronunciation = "data_not_set"
+            strongs_def = "data_not_set"
+            kjv_def = "data_not_set"
+
+            try:
+                unicode = entry.getElementsByTagName('greek')[0].attributes['unicode'].value
+            except:
+                continue
+
+            try:
+                translit = entry.getElementsByTagName('greek')[0].attributes['translit'].value
+            except:
+                continue
+            
+            try:
+                pronunciation = entry.getElementsByTagName('pronunciation')[0].attributes['strongs'].value
+            except:
+                continue
+            
+            try:
+                strongs_def = getText(entry.getElementsByTagName("strongs_def")[0].childNodes).replace("\n","")
+            except:
+                continue
+            
+            try:
+                kjv_def = getText(entry.getElementsByTagName("kjv_def")[0].childNodes).replace("\n","").replace(":--","")
+            except:
+                continue
+            
+            if deunicode(query) == deunicode(unicode):
+                return (True, (number, unicode, translit, pronunciation, strongs_def, kjv_def))
+
+            words.append((deunicode(unicode), unicode))
+
+        return (False, words)
+
+    def findSimiliar(query, words):
+        similiar = []
+        for d in difflib.get_close_matches(deunicode(query), [w[0] for w in words]): #Transform tuplet array into deunicoded array
+            i = [w[0] for w in words].index(d)
+            similiar.append([w[1] for w in words][i]) #Append unicode version
+        return(similiar)
+
+    def similiarSelection(similiar):
+        print("No exact match, but theses words are similiar:")
+        for i in range(0, len(similiar)):
+            print("[" + str(i + 1) + "] " + similiar[i])
+        while True:
+            inputC = input("Enter a number or 'q' to quit [default is 1]: ")
+            try:  
+                if int(inputC) in range(1, len(similiar) + 1) :
+                    return similiar[int(inputC) - 1]
+            except:
+                if inputC == "":
+                    return similiar[0]
+
+                if inputC == "q":
+                    sys.exit(1)
+
+
+    found = querydata(argv[-1])
+
+    if (found[0] == True):
+        printDefinition(*found[1])
+        sys.exit(0)
+    elif not strictOption:
+        similiar = findSimiliar(argv[-1], found[1])
+        if len(similiar) == 0:
+            print("No match or similiar match found!")
+            sys.exit(1) 
+            
+        if defaultOption:
+            newQuery = similiar[0]
+        else:
+            newQuery = similiarSelection(similiar)
+
+        printDefinition(*querydata(newQuery)[1])
+        sys.exit(0)
+
+    sys.exit(1)
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print(usage)
+        sys.exit(2)
+    main(sys.argv[1:])
