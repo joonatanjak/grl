@@ -1,7 +1,17 @@
 # grl
 Simple command-line Greek lexicon for Biblical (Koine) Greek.
 
-### Usage
+## Installation
+Dependencies: `python3`, `python-pip` and `git`, Install them with `apt`, `pacman` or whatever.
+
+```
+git clone https://github.com/joonatanjak/grl.git
+cd grl
+sudo make install
+```
+
+Use `sudo make uninstall` to uninstall.
+## Usage
 ```
 usage: grl [options] <word>
 
@@ -22,9 +32,15 @@ Options:
 
 When no options are supplied the program will output the Strong's number, unicode, pronunciation and KJV definition.
 Examples:
+    Look up "Θεός"
+        grl Θεός
     Only output the KJV definition of παρακοῆς
         grl -k παρακοῆς
     You can find some words using the rough transliteraion of it
         grl agape
+    
 
 ```
+
+## Known bugs
+* References to Greek words from definitions are empty.
