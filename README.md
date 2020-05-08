@@ -38,8 +38,6 @@ Examples:
         grl -s παρακοῆς
     You can find some words using the rough transliteraion of it
         grl agape
-    
-
 ```
 
 ## Known bugs
