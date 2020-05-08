@@ -2,7 +2,7 @@
 Simple command-line Greek lexicon for Biblical (Koine) Greek.
 
 ## Installation
-> Dependencies: `python3`, `python-pip` and `git`, Install them with `apt`, `pacman` or any toher package manager.
+> Dependencies: `python3`, `python-pip` and `git`, Install them with `apt`, `pacman` or any other package manager.
 
 ```sh
 git clone https://github.com/joonatanjak/grl.git
@@ -15,7 +15,7 @@ Use `sudo make uninstall` to uninstall.
 ```
 usage: grl [options] <word>
 
-Look up the Strong's lexicon of a koine greek word.
+Look up the Strong's lexicon of a Koine Greek word.
 Options:
  -n, --number               Display the Strong's number.
  -u, --unicode              Display the word in unicode.
